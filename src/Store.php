@@ -16,7 +16,7 @@ if(false === class_exists("\Composer\Autoload\ClassLoader")) {
     foreach (glob(__DIR__ . '/Exceptions/*.php') as $exception) {
         require_once $exception;
     }
-    foreach (glob(__DIR__ . '/Traits/*.php') as $traits) {
+    foreach (glob(__DIR__ . '/Classes/*.php') as $traits) {
       require_once $traits;
     }
     foreach (glob(__DIR__ . '/*.php') as $class) {
@@ -496,6 +496,30 @@ class Store
   public function getPrimaryKey(): string
   {
     return $this->primaryKey;
+  }
+
+  /**
+   * Returns the amount of documents in the store.
+   * @return int
+   * @throws IOException
+   */
+  public function count(): int
+  {
+    if($this->_getUseCache() === true){
+      $cacheTokenArray = ["count" => true];
+      $cache = new Cache($this->getStorePath(), $cacheTokenArray, null);
+      $cacheValue = $cache->get();
+      if(is_array($cacheValue) && array_key_exists("count", $cacheValue)){
+        return $cacheValue["count"];
+      }
+    }
+    $value = [
+      "count" => IoHelper::countFolderContent($this->getDataPath())
+    ];
+    if(isset($cache)) {
+      $cache->set($value);
+    }
+    return $value["count"];
   }
 
   /**

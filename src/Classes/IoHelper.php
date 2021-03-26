@@ -230,4 +230,17 @@ class IoHelper {
       $directory .= "/";
     }
   }
+
+  /**
+   * Returns the amount of files in folder.
+   * @param string $folder
+   * @return int
+   * @throws IOException
+   */
+  public static function countFolderContent(string $folder): int
+  {
+    self::checkRead($folder);
+    $fi = new \FilesystemIterator($folder, \FilesystemIterator::SKIP_DOTS);
+    return iterator_count($fi);
+  }
 }
